@@ -1,0 +1,21 @@
+𝑏𝑒𝑐𝑎𝑢𝑠𝑒 In Lithuanian, "phrase" is translated to "frazė".
+
+⨍ resolve «x» in «e» ⎨
+   if «x» is a var then ⎨
+       𝓈𝒶𝓋ℯ «x»
+       get 𝑖𝑡s value in «e»
+       if 𝑖𝑡 is a var then ⎨
+           ✓ 𝑏𝑒𝑐𝑎𝑢𝑠𝑒 «x» is already saved as 𝑖𝑡
+       ⎬ else ⎨
+           resolve 𝑖𝑡 again 𝑖𝑛 «e» 𝑏𝑒𝑐𝑎𝑢𝑠𝑒 𝑖𝑡 might, again, be compound
+       ⎬
+  ⎬
+  if «x» is not compound then ⎨
+       𝓈𝒶𝓋ℯ «x»
+       ✓ 𝑏𝑒𝑐𝑎𝑢𝑠𝑒 we're done
+  ⎬
+  if «x» is compound and is not a var then ⎨
+      𝓈𝒶𝓋ℯ «x»
+      break 𝑖𝑡 down into parts and return a compound with each element deeply resolved 𝑖𝑛 «e»
+  ⎬
+⎬

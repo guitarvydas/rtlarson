@@ -1,0 +1,29 @@
+enbracket {
+
+main [ topLevel+] = ‛«topLevel»’
+
+topLevel_comment [ comment] =‛«comment»’
+topLevel_def [ _1 spaces1 name spaces2 parameters spaces3 _2 stuff+] =‛«_1»«spaces1»«name»«spaces2»«parameters»«spaces3»«_2»«stuff»’
+topLevel_class [ _3 spaces1 name spaces2 _4 stuff+] =‛«_3»«spaces1»«name»«spaces2»«_4»«stuff»’
+topLevel_var [ name space spaces stuff+] =‛«name»«space»«spaces»«stuff»’
+topLevel_any [ any] =‛«any»’
+comment [ _5 notnl* nl] = ‛«_5»«notnl»«nl»’
+
+parameters_empty [ _6 _7] =‛«_6»«_7»’
+parameters_params [ _8 spaces1 name spaces2 commaparam* _9] =‛«_8»«spaces1»«name»«spaces2»«commaparam»«_9»’
+commaparam [ spaces1 _10 spaces2 name] = ‛«spaces1»«_10»«spaces2»«name»’
+stuff [ any] = ‛«any»’
+name [ id] = ‛«id»’
+
+keyword_def [ _11_la_ space] =‛«_11»_la_«space»’
+keyword_class [ _12_la_ space] =‛«_12»_la_«space»’
+id [ firstLetter followingLetter*] = ‛«firstLetter»«followingLetter»’
+firstLetter [ _17] = ‛«_17»’
+followingLetter [ _18] = ‛«_18»’
+math_symbol [ _21] = ‛«_21»’
+reserved_unicode_character [ _32] = ‛«_32»’
+unicode_superscript [ _39] = ‛«_39»’
+unicode_subscript [ _42] = ‛«_42»’
+nl [ _43] = ‛«_43»’
+notnl [ any] = ‛«any»’
+}

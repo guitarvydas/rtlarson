@@ -1,0 +1,35 @@
+enbracket {
+  main = topLevel+
+
+  topLevel =
+    | comment -- comment
+    | "def " spaces name spaces parameters spaces ":"  stuff+ -- def
+    | "class " spaces name spaces ":"  stuff+ -- class
+    | name space spaces stuff+ -- var
+    | any -- any
+
+  comment = "#" notnl* nl
+
+  parameters =
+    | "(" ")" -- empty
+    | "(" spaces name spaces commaparam* ")" -- params
+  commaparam = spaces "," spaces name
+  stuff  = ~keyword any
+  name = ~keyword id
+  keyword =
+    | "def" &space -- def
+    | "class" &space -- class
+
+  id = firstLetter followingLetter*
+  firstLetter = ~reserved_unicode_character (letter | "_" | "'" | "-" | "?" | math_symbol | unicode_subscript | unicode_superscript)
+  followingLetter = (firstLetter | digit)
+  math_symbol = "\u{1d400}".."\u{1d7ff}"
+
+  reserved_unicode_character = ("ˀ" | "ᵅ" | "." | "・" | "◦" | "≡" | "⇒" | "⇐" | "«" | "»")
+  unicode_superscript = ("\u{00B0}" .. "\u{00BF}" | "\u{2070}" .. "\u{207F}")
+  unicode_subscript = "\u{2080}" .. "\u{209F}"
+
+  nl = "\n"
+  notnl = ~nl any
+}
+
