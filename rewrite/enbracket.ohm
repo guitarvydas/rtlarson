@@ -2,18 +2,25 @@ enbracket {
   main = topLevel+
 
   topLevel =
+    | space+ -- space
     | comment -- comment
     | "def " spaces name spaces parameters spaces ":"  stuff+ -- def
     | "class " spaces name spaces ":"  stuff+ -- class
     | name space spaces stuff+ -- var
-    | any -- any
 
   comment = "#" notnl* nl
 
   parameters =
     | "(" ")" -- empty
-    | "(" spaces name spaces commaparam* ")" -- params
-  commaparam = spaces "," spaces name
+    | "(" spaces param+ spaces ")" -- param
+  param =
+    | name spaces "=" spaces "None" spaces ","? spaces -- none
+    | name spaces "=" spaces "[]" spaces ","? spaces -- emptylist
+    | name spaces "=" spaces "\"" "\"" spaces ","? spaces -- emptystring
+    | name spaces "=" spaces "False" spaces ","? spaces -- false
+    | name spaces "=" spaces "True" spaces ","? spaces -- true
+    | name spaces "=" spaces string spaces ","? spaces -- string
+    | name ","? spaces -- nodefault
   stuff  = ~keyword any
   name = ~keyword id
   keyword =
@@ -25,10 +32,12 @@ enbracket {
   followingLetter = (firstLetter | digit)
   math_symbol = "\u{1d400}".."\u{1d7ff}"
 
-  reserved_unicode_character = ("ˀ" | "ᵅ" | "." | "・" | "◦" | "≡" | "⇒" | "⇐" | "«" | "»")
+  reserved_unicode_character = ("ˀ" | "ᵅ" | "." | "・" | "◦" | "≡" | "⇒" | "⇐" | "«" | "»" | "⦑" | "⦒")
   unicode_superscript = ("\u{00B0}" .. "\u{00BF}" | "\u{2070}" .. "\u{207F}")
   unicode_subscript = "\u{2080}" .. "\u{209F}"
 
+  string = "\"" notdq* "\""
+  notdq =  ~"\"" any
   nl = "\n"
   notnl = ~nl any
 }

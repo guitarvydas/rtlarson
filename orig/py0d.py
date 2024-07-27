@@ -221,7 +221,7 @@ drUp = "up"
 drAcross = "across"
 drThrough = "through"
 
-# See "class free programming" starting at 45:01 of https://www.youtube.com/watch?v=XFTOG895C7c
+# See "class-free programming" starting at 45:01 of https://www.youtube.com/watch?v=XFTOG895C7c
 
 def make_Routing_Descriptor (action=None, component=None, port=None, message=None):
     return {

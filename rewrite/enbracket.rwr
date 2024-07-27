@@ -2,16 +2,24 @@ enbracket {
 
 main [ topLevel+] = ‛«topLevel»’
 
+topLevel_space [ s+] =‛«s»’
 topLevel_comment [ comment] =‛«comment»’
-topLevel_def [ _1 spaces1 name spaces2 parameters spaces3 _2 stuff+] =‛«_1»«spaces1»«name»«spaces2»«parameters»«spaces3»«_2»«stuff»’
-topLevel_class [ _3 spaces1 name spaces2 _4 stuff+] =‛«_3»«spaces1»«name»«spaces2»«_4»«stuff»’
-topLevel_var [ name space spaces stuff+] =‛«name»«space»«spaces»«stuff»’
-topLevel_any [ any] =‛«any»’
-comment [ _5 notnl* nl] = ‛«_5»«notnl»«nl»’
+topLevel_def [ _1 spaces1 name spaces2 parameters spaces3 _2 stuff+] =‛\ndefn «spaces1»«name»«spaces2»«parameters»«spaces3» {\n«stuff»\n}’
+topLevel_class [ _3 spaces1 name spaces2 _4 stuff+] =‛\ndefclass «spaces1»«name»«spaces2» {\n«stuff»\n}’
+topLevel_var [ name space spaces stuff+] =‛\ndefvar «name»«space»«spaces»{\n«stuff»\n}’
+comment [ _5 notnl* nl] = ‛⦑«_5»«notnl»⦒«nl»’
 
 parameters_empty [ _6 _7] =‛«_6»«_7»’
-parameters_params [ _8 spaces1 name spaces2 commaparam* _9] =‛«_8»«spaces1»«name»«spaces2»«commaparam»«_9»’
-commaparam [ spaces1 _10 spaces2 name] = ‛«spaces1»«_10»«spaces2»«name»’
+parameters_param [lb ws1 p+ ws2 rb] =‛«lb»«ws1»«p»«ws2»«rb»’
+
+param_none [ name spaces1 _10 spaces2 _11 spaces3 _12? spaces4] =‛«name»«spaces1»«_10»«spaces2»«_11»«spaces3»«_12»«spaces4»’
+param_emptylist [ name spaces1 _13 spaces2 _14 spaces3 _15? spaces4] =‛«name»«spaces1»«_13»«spaces2»«_14»«spaces3»«_15»«spaces4»’
+param_emptystring [ name spaces1 _16 spaces2 _17 _18 spaces3 _19? spaces4] =‛«name»«spaces1»«_16»«spaces2»«_17»«_18»«spaces3»«_19»«spaces4»’
+param_false [ name spaces1 _20 spaces2 _21 spaces3 _22? spaces4] =‛«name»«spaces1»«_20»«spaces2»«_21»«spaces3»«_22»«spaces4»’
+param_true [ name spaces1 _23 spaces2 _24 spaces3 _25? spaces4] =‛«name»«spaces1»«_23»«spaces2»«_24»«spaces3»«_25»«spaces4»’
+param_string [ name spaces1 _26 spaces2 string spaces3 _27? spaces4] =‛«name»«spaces1»«_26»«spaces2»«string»«spaces3»«_27»«spaces4»’
+param_nodefault [ name _28? spaces] =‛«name»«_28»«spaces»’
+
 stuff [ any] = ‛«any»’
 name [ id] = ‛«id»’
 
@@ -26,4 +34,7 @@ unicode_superscript [ _39] = ‛«_39»’
 unicode_subscript [ _42] = ‛«_42»’
 nl [ _43] = ‛«_43»’
 notnl [ any] = ‛«any»’
+space [c] = ‛«c»’
+string [lq cs* rq] = ‛«lq»«cs»«rq»’
+notdq [c] = ‛«c»’
 }
