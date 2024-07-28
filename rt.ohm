@@ -1,4 +1,33 @@
 rt {
+  Main = TopLevel+
+  TopLevel =
+    | Defvar -- defvar
+    | Defn -- defn
+    | Defclass -- defclass
+
+   Defvar = kw<"defvar"> "=" Exp
+   Defn = kw<"defn"> ident Formals StatementBlock
+   Defclass = kw<"defclass"> ident "{" Definit "}"
+   
+
+   StatementBlock = "{" Statement+ "}"
+
+   Definit = kw<"definit"> "(" kw<"self"> ":" ident ")" "{" InitStatement+ "}"
+   
+   Statement =
+     | kw<"useglobal"> "(" ident ")" -- global
+     | IfStatement -- if
+     | Assignment -- assignment
+     | kw<"pass"> -- pass
+     | kw<"return"> Exp -- return
+
+   InitStatement = kw<"self"> "." ident "=" Exp
+
+   IfStatement = kw<"if"> Exp StatementBlock ElifStatement* ElseStatement?
+   ElifStatement = kw<"elif"> Exp StatementBlock
+   ElseStatement = kw<"else"> StatementBlock
+
+   Assignment = Lval "=" Exp
 
     Exp
       = AddExp
@@ -19,9 +48,12 @@ rt {
 
     PriExp =
       | "(" Exp ")"  -- paren
-      | "[" PriExp* "]" -- listconst
-      | "{" Pair* "}" -- dict
-      | "fresh" "(" ident ")" -- fresh
+      | "[" "]" -- emptylistconst
+      | "[" (PriExp ","?)+ "]" -- listconst
+      | "{" "}" -- emptydict
+      | "{" (Pair ","?)+ "}" -- dict
+      | "λ" Formals? ":" Exp -- lambda
+      | kw<"fresh"> "(" ident ")" -- fresh
       | PriExp Actuals -- call
       | "+" PriExp   -- pos
       | "-" PriExp   -- neg
@@ -31,27 +63,37 @@ rt {
       | ident -- ident
       | number -- number
 
+    Lval = ident FieldRef? "=" Exp
+
     keyword =
-      | "fresh" ~identTail
+      | kw<"fresh">
+      | kw<"defvar">
+      | kw<"defn">
+      | kw<"defclass">
+      | kw<"definit">
+      | kw<"self">
+      | kw<"useglobal">
+      | kw<"pass">
+      | kw<"return">
+      | kw<"if">
+      | kw<"elif">
+      | kw<"else">
       
     ident  (an identifier)
       = ~keyword letter identTail*
 
     identTail = alnum
 
-    lambda =
-      | "λ" Formals? Expr
-
     Formals = "(" ident ("," ident)* ")" ":"
     Actuals = 
       | "(" ")" -- noactuals
-      | "(" Expr ("," Expr)* ")" -- actuals
+      | "(" Exp ("," Exp)* ")" -- actuals
 
     number  (a number)
       = digit* "." digit+  -- fract
       | digit+             -- whole
 
-    Pair = string ":" Expr ","?
+    Pair = string ":" Exp ","?
 
   FieldRef = "[" string "]"
 
@@ -61,4 +103,7 @@ rt {
     | "'" notsq* "'" -- sqstring
   notdq = ~"\"" any
   notsq = ~"'" any
+
+   kw<s> = s ~identTail
+
 }
