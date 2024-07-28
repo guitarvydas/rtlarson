@@ -1,0 +1,64 @@
+rt {
+
+    Exp
+      = AddExp
+
+    AddExp
+      = AddExp "+" MulExp  -- plus
+      | AddExp "-" MulExp  -- minus
+      | MulExp
+
+    MulExp
+      = MulExp "*" ExpExp  -- times
+      | MulExp "/" ExpExp  -- divide
+      | ExpExp
+
+    ExpExp
+      = PriExp "^" ExpExp  -- power
+      | PriExp
+
+    PriExp =
+      | "(" Exp ")"  -- paren
+      | "[" PriExp* "]" -- listconst
+      | "{" Pair* "}" -- dict
+      | "fresh" "(" ident ")" -- fresh
+      | PriExp Actuals -- call
+      | "+" PriExp   -- pos
+      | "-" PriExp   -- neg
+      | phi -- phi
+      | string -- string
+      | ident FieldRef -- fieldref
+      | ident -- ident
+      | number -- number
+
+    keyword =
+      | "fresh" ~identTail
+      
+    ident  (an identifier)
+      = ~keyword letter identTail*
+
+    identTail = alnum
+
+    lambda =
+      | "λ" Formals? Expr
+
+    Formals = "(" ident ("," ident)* ")" ":"
+    Actuals = 
+      | "(" ")" -- noactuals
+      | "(" Expr ("," Expr)* ")" -- actuals
+
+    number  (a number)
+      = digit* "." digit+  -- fract
+      | digit+             -- whole
+
+    Pair = string ":" Expr ","?
+
+  FieldRef = "[" string "]"
+
+  phi = "ϕ"
+  string =
+    | "\"" notdq* "\"" -- dqstring
+    | "'" notsq* "'" -- sqstring
+  notdq = ~"\"" any
+  notsq = ~"'" any
+}

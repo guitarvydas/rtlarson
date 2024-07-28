@@ -1,27 +1,27 @@
-defvar counter = 0
-
-defvar digits = [
-    "₀", "₁", "₂", "₃", "₄", "₅",
-    "₆", "₇", "₈", "₉",
-    "₁₀", "₁₁", "₁₂", "₁₃", "₁₄",
-    "₁₅", "₁₆", "₁₇", "₁₈", "₁₉",
-    "₂₀", "₂₁", "₂₂", "₂₃", "₂₄",
-    "₂₅", "₂₆", "₂₇", "₂₈", "₂₉"
-]
+defvar counter = intconst (0)
 
 defn gensym (s) {
     useglobal (counter)
-    name_with_id = f"{s}{subscripted_digit (counter)}"
+    name_with_id = f"{s}{subscripted_digit (global (counter))}"
     counter += 1
     return name_with_id
 }
 
+defvar digits = arrayconst ( 20, string,
+    stringconst ("₀"), stringconst ("₁"), stringconst ("₂"), stringconst ("₃"), stringconst ("₄"), stringconst ("₅"),
+    stringconst ("₆"), stringconst ("₇"), stringconst ("₈"), stringconst ("₉"),
+    stringconst ("₁₀"), stringconst ("₁₁"), stringconst ("₁₂"), stringconst ("₁₃"), stringconst ("₁₄"),
+    stringconst ("₁₅"), stringconst ("₁₆"), stringconst ("₁₇"), stringconst ("₁₈"), stringconst ("₁₉"),
+    stringconst ("₂₀"), stringconst ("₂₁"), stringconst ("₂₂"), stringconst ("₂₃"), stringconst ("₂₄"),
+    stringconst ("₂₅"), stringconst ("₂₆"), stringconst ("₂₇"), stringconst ("₂₈"), stringconst ("₂₉")
+    )
+
 defn subscripted_digit (n) {
   useglobal (digits)
   if (n >= 0 and n <= 29) {
-    return digits [n]
+    return arraylookup (global (digits), n)
   } else {
-    return f"₊{n}"
+    return formatstring ("₊«a»", n)
   }
 }
 
@@ -381,7 +381,7 @@ defn fmt_send_string (desc, indent) {
 defn make_Forward_Descriptor (component=ϕ, port=ϕ, message=ϕ, cause_port=ϕ, cause_message=ϕ) {
 
     rdesc = make_Routing_Descriptor (action=drSend, component=component, port=port, message=message)
-    fmt_forward = λ (desc) : ''
+    fmt_forward = λ (desc) ''
     return {
         "action": drForward,
         "component": rdesc ["component"],

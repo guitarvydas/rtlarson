@@ -1,27 +1,27 @@
-defvar counter = 0
-
-defvar digits = [
-    "₀", "₁", "₂", "₃", "₄", "₅",
-    "₆", "₇", "₈", "₉",
-    "₁₀", "₁₁", "₁₂", "₁₃", "₁₄",
-    "₁₅", "₁₆", "₁₇", "₁₈", "₁₉",
-    "₂₀", "₂₁", "₂₂", "₂₃", "₂₄",
-    "₂₅", "₂₆", "₂₇", "₂₈", "₂₉"
-]
+defvar counter = intconst (0)
 
 defn gensym (s) {
     useglobal (counter)
-    name_with_id = f"{s}{subscripted_digit (counter)}"
+    name_with_id = f"{s}{subscripted_digit (global (counter))}"
     counter += 1
     return name_with_id
 }
 
+defvar digits = arrayconst ( 20, string,
+    stringconst ("₀"), stringconst ("₁"), stringconst ("₂"), stringconst ("₃"), stringconst ("₄"), stringconst ("₅"),
+    stringconst ("₆"), stringconst ("₇"), stringconst ("₈"), stringconst ("₉"),
+    stringconst ("₁₀"), stringconst ("₁₁"), stringconst ("₁₂"), stringconst ("₁₃"), stringconst ("₁₄"),
+    stringconst ("₁₅"), stringconst ("₁₆"), stringconst ("₁₇"), stringconst ("₁₈"), stringconst ("₁₉"),
+    stringconst ("₂₀"), stringconst ("₂₁"), stringconst ("₂₂"), stringconst ("₂₃"), stringconst ("₂₄"),
+    stringconst ("₂₅"), stringconst ("₂₆"), stringconst ("₂₇"), stringconst ("₂₈"), stringconst ("₂₉")
+    )
+
 defn subscripted_digit (n) {
   useglobal (digits)
   if (n >= 0 and n <= 29) {
-    return digits [n]
+    return arraylookup (global (digits), n)
   } else {
-    return f"₊{n}"
+    return formatstring ("₊«a»", n)
   }
 }
 
@@ -39,11 +39,11 @@ defclass Datum {
 defn new_datum_string (s) {
     d = fresh (Datum)
     d.data = s
-    d.clone = λ clone_datum_string (d)
-    d.reclaim = λ reclaim_datum_string (d)    
-    d.srepr = λ srepr_datum_string (d)
-    d.raw = λ raw_datum_string (d)    
-    d.kind = λ "string"
+    d.clone = λ { return clone_datum_string (d) }
+    d.reclaim = λ { reclaim_datum_string (d)    }
+    d.srepr = λ { return srepr_datum_string (d)}
+    d.raw = λ { raw_datum_string (d)    }
+    d.kind = λ {return "string"}
     return d
 
 
@@ -68,22 +68,17 @@ defn srepr_datum_string (d) {
 
 }
 defn raw_datum_string (d) {
-
-  return bytearray (d.data,'UTF_8')
-
-
-
-
+  return string_as_bytes (d.data)
 }
 defn new_datum_bang () {
 
     p = Datum ()
     p.data = ⊤
-    p.clone = λ clone_datum_bang (p)
-    p.reclaim = λ reclaim_datum_bang (p)
-    p.srepr = λ srepr_datum_bang ()
-    p.raw = λ raw_datum_bang ()    
-    p.kind = λ "bang"
+    p.clone = λ { return clone_datum_bang (p)}
+    p.reclaim = λ { return reclaim_datum_bang (p)}
+    p.srepr = λ { return srepr_datum_bang ()}
+    p.raw = λ {return raw_datum_bang ()    }
+    p.kind = λ {return stringconst ("bang") }
     return p
 
 
@@ -103,13 +98,13 @@ defn reclaim_datum_bang (d) {
 }
 defn srepr_datum_bang () {
       
-    return "!"
+    return stringconst ("!")
 
 
 }
 defn raw_datum_bang () {
 
-    return []
+    return arrayconstempty ()
 
 
 
@@ -118,10 +113,10 @@ defn raw_datum_bang () {
 defn new_datum_tick () {
       
     p = new_datum_bang ()
-    p.kind = λ "tick"
-    p.clone = λ new_datum_tick ()
-    p.srepr = λ srepr_datum_tick ()
-    p.raw = λ raw_datum_tick ()
+    p.kind = λ { return stringconst ("tick")}
+    p.clone = λ {new_datum_tick ()}
+    p.srepr = λ {srepr_datum_tick ())
+    p.raw = λ {raw_datum_tick ()}
     return p
 
 
@@ -129,14 +124,14 @@ defn new_datum_tick () {
 }
 defn srepr_datum_tick () {
 
-    return "."
+    return stringconst (".")
 
 
 
 }
 defn raw_datum_tick () {
       
-    return []
+    return arrayconstempty ()
 
 
 
@@ -145,11 +140,11 @@ defn new_datum_bytes (b) {
       
     p = Datum ()
     p.data = b[:]
-    p.clone = clone_datum_bytes
-    p.reclaim = λ reclaim_datum_bytes (p)
-    p.srepr = λ srepr_datum_bytes (b)
-    p.raw = λ raw_datum_bytes (b)
-    p.kind = λ "bytes"
+    p.clone = &clone_datum_bytes
+    p.reclaim = λ {return reclaim_datum_bytes (p)}
+    p.srepr = λ {return srepr_datum_bytes (b)}
+    p.raw = λ {return raw_datum_bytes (b)}
+    p.kind = λ {return stringconst ("bytes")}
     return p
 
 
@@ -157,7 +152,7 @@ defn new_datum_bytes (b) {
 }
 defn clone_datum_bytes (src) {
       
-    p = Datum ()
+    p = fresh (Datum)
     p = src
     p.data = src.clone ()
     return p
@@ -173,11 +168,7 @@ defn reclaim_datum_bytes (src) {
 
 }
 defn srepr_datum_bytes (d) {
-
-    return d.data.decode ('utf_8')
-
-
-
+ return bytes_as_string (d.data)
 }
 defn raw_datum_bytes (d) {
 
@@ -195,13 +186,13 @@ defn new_datum_handle (h) {
 }
 defn new_datum_int (i) {
       
-    p = Datum ()
+    p = fresh (Datum)
     p.data = i
-    p.clone = λ clone_int (i)
-    p.reclaim = λ reclaim_int (i)
-    p.srepr = λ srepr_datum_int (i)
-    p.raw = λ raw_datum_int (i)
-    p.kind = λ "int"
+    p.clone = λ { return clone_int (i)}
+    p.reclaim = λ { return reclaim_int (i)}
+    p.srepr = λ { return srepr_datum_int (i)}
+    p.raw = λ { return raw_datum_int (i)}
+    p.kind = λ { return stringconst ("int")}
     return p
 
 
@@ -209,7 +200,7 @@ defn new_datum_int (i) {
 }
 defn clone_int (i) {
       
-    p = Datum ()
+    p = fresh (Datum)
     p = new_datum_int (i)
     return p
 
@@ -223,20 +214,17 @@ defn reclaim_int (src) {
 
 }
 defn srepr_datum_int (i) {
-
-  return str (i)
-
-
+  return int_as_string (i)
 }
 defn raw_datum_int (i) {
-      
     return i
+}
+
 # Message passed to a leaf component.
 #
 # `port` refers to the name of the incoming or outgoing port of this component.
 # `datum` is the data attached to this message.
 
-}
 defclass Message {
 
     
@@ -261,21 +249,21 @@ defn clone_port (s) {
 }
 defn make_message (port, datum) {
 
-    p = clone_string (port)
+    p = clone_tag (port)
     m = Message (port=p, datum=datum.clone ())
     return m
+}
 
 # Clones a message. Primarily used internally for "fanning out" a message to multiple destinations.
-
-}
 defn message_clone (message) {
 
     m = Message (port=clone_port (message.port), datum=message.datum.clone ())
     return m
 
+}
+
 # Frees a message.
 
-}
 defn destroy_message (msg) {
 
     # during debug, don't destroy any message, since we want to trace messages, thus, we need to persist ancestor messages
@@ -284,375 +272,309 @@ defn destroy_message (msg) {
 
 }
 defn destroy_datum (msg) {
-
     pass
-
-
 }
 defn destroy_port (msg) {
-
     pass
-
-#####
-
-
 }
+
+
+
 defn format_message (m) {
 
-    if m == ϕ:
-        return "ϕ"
-    else:
-        return f'⟪"{m.port}"⦂"{m.datum.srepr ()}"⟫'
-
-# dynamic routing descriptors
-
-drInject = "inject"
-drSend = "send"
-drInOut = "inout"
-drForward = "forward"
-drDown = "down"
-drUp = "up"
-drAcross = "across"
-drThrough = "through"
+    if m == ϕ {
+        return stringconst ("ϕ")
+    } else {
+        return formatstring ("⟪'«a»'⦂'«a»'⟫", m.port, m.datum.srepr ())
+    }
 
 # See "class_free programming" starting at 45:01 of https://www.youtube.com/watch?v=XFTOG895C7c
 
 
 }
 defn make_Routing_Descriptor (action=ϕ, component=ϕ, port=ϕ, message=ϕ) {
-
-    return {
-        "action": action,
-        "component": component,
-        "port": port,
-        "message": message
-        }
-
-
-
-####
-
+    return fresh-dict (
+        key ("action"): ⟪%param, _, action, _⟫,
+        key ("component"): ⟪%param, _, component, _⟫,
+        key ("port"): ⟪%param, _, port, _⟫,
+        key ("message"): ⟪%param, _, message, _⟫
+	)
 }
 defn make_Send_Descriptor (component=ϕ, port=ϕ, message=ϕ, cause_port=ϕ, cause_message=ϕ) {
-
-    rdesc = make_Routing_Descriptor (action=drSend, component=component, port=port, message=message)
-    return {
-        "action": drSend,
-        "component": rdesc ["component"],
-        "port": rdesc ["port"],
-        "message": rdesc ["message"],
-        "cause_port": cause_port,
-        "cause_message": cause_message,
-        "fmt": fmt_send
-        }
-
-
+    scoped rdesc = make_Routing_Descriptor (action=symbol ("send"), component=component, port=port, message=message) {
+	return fresh-dict (
+	    key ("action"): symbol ("send"),
+	    key ("component"): dict-lookup (rdesc, "component"),
+	    key ("port"): dict-lookup (rdesc, "port"),
+	    key ("message"): dict-lookup (rdesc, "message"),
+	    key ("cause_port"): ⟪%param, _, cause_port,  _⟫,
+	    key ("cause_message"): ⟪%param, _, cause_message,  _⟫,
+	    key ("fmt"): &fmt_send
+	    )
+     }
 }
 defn log_send (sender, sender_port, msg, cause_msg) {
-
     send_desc = make_Send_Descriptor (component=sender, port=sender_port, message=msg, cause_port=cause_msg.port, cause_message=cause_msg)
     append_routing_descriptor (container=sender.owner, desc=send_desc)
-
-
 }
 defn log_send_string (sender, sender_port, msg, cause_msg) {
-
     send_desc = make_Send_Descriptor (sender, sender_port, msg, cause_msg.port, cause_msg)
     append_routing_descriptor (container=sender.owner, desc=send_desc)
-
-
-
-
 }
 defn fmt_send (desc, indent) {
-
-    return ""
-    #return f'\n{indent}⋯ {desc ["component"].name}."{desc ["cause_port"]}" ∴ {desc ["component"].name}."{desc ["port"]}" {format_message (desc ["message"])}'
-
+    return stringconst ("")
 }
 defn fmt_send_string (desc, indent) {
-
     return fmt_send (desc, indent)
-
-
-####
-
 }
 defn make_Forward_Descriptor (component=ϕ, port=ϕ, message=ϕ, cause_port=ϕ, cause_message=ϕ) {
-
-    rdesc = make_Routing_Descriptor (action=drSend, component=component, port=port, message=message)
-    fmt_forward = λ (desc) : ''
-    return {
-        "action": drForward,
-        "component": rdesc ["component"],
-        "port": rdesc ["port"],
-        "message": rdesc ["message"],
-        "cause_port": cause_port,
-        "cause_message": cause_message,
-        "fmt": fmt_forward
-        }
-
-
+    scoped rdesc = make_Routing_Descriptor (action=symbol ("send"), component=component, port=port, message=message) {
+	return fresh-dict (
+	    key ("action"): symbol ("forward"),
+	    key ("component"): dict-lookup (rdesc, "component"),
+	    key ("port"): dict-lookup (rdesc, "port"),
+	    key ("message"): dict-lookup (rdesc, "message"),
+	    key ("cause_port"): ⟪%param, _, cause_port, _⟫,
+	    key ("cause_message"): ⟪%param, _, cause_message, _⟫,
+	    key ("fmt"): λ (desc) { return stringconst ("")}
+	    )
+    }
 }
 defn log_forward (sender, sender_port, msg, cause_msg) {
-
     pass # when needed, it is too frequent to bother logging
-
-
 }
 defn fmt_forward (desc) {
-
-    print (f"*** Error fmt_forward {desc}")
+    print (formatstring ("*** Error fmt_forward «a»", desc)
     quit ()
-
-####
-
 }
 defn make_Inject_Descriptor (receiver=ϕ, port=ϕ, message=ϕ) {
-
-    rdesc = make_Routing_Descriptor (action=drInject, component=receiver, port=port, message=message)
-    return {
-        "action": drInject,
-        "component": rdesc ["component"],
-        "port": rdesc ["port"],
-        "message": rdesc ["message"],
-        "fmt" : fmt_inject
-        }
-
-
+    scoped rdesc = make_Routing_Descriptor (action=symbol ("inject"), component=receiver, port=port, message=message) {
+     return fresh-dict (
+         key ("action"): symbol ("inject"),
+         key ("component"): dict-lookup (rdesc, "component"),
+         key ("port"): dict-lookup (rdesc, "port"),
+         key ("message"): dict-lookup (rdesc, "message"),
+         key ("fmt") : &fmt_inject
+         )
+    }
 }
-defn log_inject (receiver, port, msg) {
 
-    inject_desc = make_Inject_Descriptor (receiver=receiver, port=port, message=msg)
-    append_routing_descriptor (container=receiver, desc=inject_desc)
-
-
+defn log_inject (^receiver, port, msg) {
+    scoped inject_desc = make_Inject_Descriptor (receiver=receiver, port=port, message=msg) {
+        append_routing_descriptor (^container=receiver, desc=inject_desc)
+    }
 }
 defn fmt_inject (desc, indent) {
-
-    return f'\n{indent}⟹  {desc ["component"].name}."{desc ["port"]}" {format_message (desc ["message"])}'
-
-
-####
-
+    scoped nm = dict-lookup (desc, "component").name {
+        scoped prt = dict-lookup (desc, "port") {
+            scoped msg = format_message (dict-lookup (desc, "message")) {
+	        return formatstring ("\n«»⟹  «».«» «»", nm, prt, msg)
+	    }
+	}
+    }
 }
 defn make_Down_Descriptor (container=ϕ, source_port=ϕ, source_message=ϕ, target=ϕ, target_port=ϕ, target_message=ϕ) {
-
-    return {
-        "action": drDown,
-        "container": container,
-        "source_port": source_port,
-        "source_message": source_message,
-        "target": target,
-        "target_port": target_port,
-        "target_message": target_message,
-        "fmt" : fmt_down
-        }
-
-
+    return fresh-dict (
+        key ("action"): symbol ("down"),
+        key ("container"): ⟪%param, _, container, _⟫,
+        key ("source_port"): ⟪%param, _, source_port _⟫,
+        key ("source_message"): ⟪%param, _, source_message _⟫,
+        key ("target"): ⟪%param, _, target _⟫,
+        key ("target_port"): ⟪%param, _, target_port _⟫,
+        key ("target_message"): ⟪%param, _, target_message _⟫,
+        key ("fmt") : &fmt_down
+        )
 }
-defn log_down (container=ϕ, source_port=ϕ, source_message=ϕ, target=ϕ, target_port=ϕ, target_message=ϕ) {
-
-    rdesc = make_Down_Descriptor (container, source_port, source_message, target, target_port, target_message)
-    append_routing_descriptor (container, rdesc)
-
-
+defn log_down (^container=ϕ, source_port=ϕ, source_message=ϕ, target=ϕ, target_port=ϕ, target_message=ϕ) {
+    scoped rdesc = make_Down_Descriptor (container, source_port, source_message, target, target_port, target_message) {
+      append_routing_descriptor (^container, rdesc)
+    }
 }
 defn fmt_down (desc, indent) {
-
-    return f'\n{indent}↓ {desc ["container"].name}."{desc ["source_port"]}" ➔ {desc ["target"].name}."{desc ["target_port"]}" {format_message (desc ["target_message"])}'
-
-
-####
-
+  scoped in = indent {
+    scoped nm = dict-lookup (desc, container).name {
+      scoped prt = dict-lookup (desc, source_port) {
+        scoped tnm = dict-lookup (desc, target).name {
+          scoped tprt = dict-lookup (desc, target_port) {
+            scoped m = format_message (dict-lookup (desc, target_message)) {
+	      return formatstring ("\n«»↓ «».'«»' ➔ «».'«»' «»", in, nm, prt, tnm, tprt, m)
+	    }
+	  }
+	}
+      }
+    }
+  }
 }
 defn make_Up_Descriptor (source=ϕ, source_port=ϕ, source_message=ϕ, container=ϕ, container_port=ϕ, container_message=ϕ) {
-
-    return {
-        "action": drUp,
-        "source": source,
-        "source_port": source_port,
-        "source_message": source_message,
-        "container": container,
-        "container_port": container_port,
-        "container_message": container_message,
-        "fmt" : fmt_up
-        }
-
-
+    return fresh-dict (
+        key (action):  symbol (up),
+        key (source):  source,
+        key (source_port):  source_port,
+        key (source_message):  source_message,
+        key (container):  container,
+        key (container_port):  container_port,
+        key (container_message):  container_message,
+        key (fmt):  &fmt_up
+        )
 }
-defn log_up (source=ϕ, source_port=ϕ, source_message=ϕ, container=ϕ, target_port=ϕ, target_message=ϕ) {
-
-    rdesc = make_Up_Descriptor (source, source_port, source_message, container, target_port, target_message)
-    append_routing_descriptor (container, rdesc)
-
-
+defn log_up (source=ϕ, source_port=ϕ, source_message=ϕ, ^container=ϕ, target_port=ϕ, target_message=ϕ) {
+    scoped rdesc = make_Up_Descriptor (source, source_port, source_message, container, target_port, target_message) {
+      append_routing_descriptor (^container, rdesc)
+    }
 }
+
 defn fmt_up (desc, indent) {
-
-    return f'\n{indent}↑ {desc ["source"].name}."{desc ["source_port"]}" ➔ {desc ["container"].name}."{desc ["container_port"]}" {format_message (desc ["container_message"])}'
-
-
-####
-
+  scoped in = indent {
+    scoped nm = dict-lookup (desc, container).name {
+      scoped prt = dict-lookup (desc, source_port) {
+        scoped cnm = dict-lookup (desc, container).name {
+          scoped cprt = dict-lookup (desc, container_port) {
+            scoped m = format_message (dict-lookup (desc, container_message) {
+              return formatstring ("«»↑ «»«» ➔ «»«»«»", in, nm, prt, cnm, cprt, m)
+	    }
+	  }
+	}
+      }
+    }
+  }
 }
 defn make_Across_Descriptor (container=ϕ, source=ϕ, source_port=ϕ, source_message=ϕ, target=ϕ, target_port=ϕ, target_message=ϕ) {
-
     return {
-        "action": drAcross,
-        "container": container,
-        "source": source,
-        "source_port": source_port,
-        "source_message": source_message,
-        "target": target,
-        "target_port": target_port,
-        "target_message": target_message,
-        "fmt" : fmt_across
+        key (action): symbol (across),
+        key (container): container,
+        key (source): source,
+        key (source_port): source_port,
+        key (source_message): source_message,
+        key (target): target,
+        key (target_port): target_port,
+        key (target_message): target_message,
+        key (fmt): &fmt_across
         }
 
 
 }
-defn log_across (container=ϕ, source=ϕ, source_port=ϕ, source_message=ϕ, target=ϕ, target_port=ϕ, target_message=ϕ) {
-
-    rdesc = make_Across_Descriptor (container, source, source_port, source_message, target, target_port, target_message)
-    append_routing_descriptor (container, rdesc)
-
-
+defn log_across (^container=ϕ, source=ϕ, source_port=ϕ, source_message=ϕ, target=ϕ, target_port=ϕ, target_message=ϕ) {
+    scoped rdesc = make_Across_Descriptor (container, source, source_port, source_message, target, target_port, target_message) {
+      append_routing_descriptor (^container, rdesc)
+    }
 }
 defn fmt_across (desc, indent) {
-
-    return f'\n{indent}→ {desc["source"].name}."{desc ["source_port"]}" ➔ {desc ["target"].name}."{desc ["target_port"]}"  {format_message (desc ["target_message"])}'
-
-
-####
-
+  scoped in = indent {
+    scoped nm = dict-lookup (desc, container).name {
+      scoped prt = dict-lookup (desc, source_port) {
+        scoped tnm = dict-lookup (desc, target).name {
+          scoped tprt = dict-lookup (desc, target_port) {
+            scoped m = format_message (dict-lookup (desc, container_message) {
+              return formatstring ("«»→ «»«» ➔ «»«»«»", in, nm, prt, tnm, tprt, m)
+	    }
+	  }
+	}
+      }
+    }
+  }
 }
 defn make_Through_Descriptor (container=ϕ, source_port=ϕ, source_message=ϕ, target_port=ϕ, message=ϕ) {
 
-    return {
-        "action": drThrough,
-        "container": container,
-        "source_port": source_port,
-        "source_message": source_message,
-        "target_port": target_port,
-        "message": message,
-        "fmt" : fmt_through
-        }
-
-
+    return fresh-dict (
+        key (action) : symbol (through),
+        key (container) : container,
+        key (source_port) : source_port,
+        key (source_message) : source_message,
+        key (target_port) : target_port,
+        key (message) : message,
+        key (fmt) : &fmt_through
+        )
 }
-defn log_through (container=ϕ, source_port=ϕ, source_message=ϕ, target_port=ϕ, message=ϕ) {
-
-    rdesc = make_Through_Descriptor (container, source_port, source_message, target_port, message)
-    append_routing_descriptor (container, rdesc)
-
-
+defn log_through (^container=ϕ, source_port=ϕ, source_message=ϕ, target_port=ϕ, message=ϕ) {
+  scoped rdesc = make_Through_Descriptor (container, source_port, source_message, target_port, message) {
+    append_routing_descriptor (^container, rdesc)
+  }
 }
 defn fmt_through (desc, indent) {
-
-    return f'\n{indent}⇶ {desc  ["container"].name}."{desc ["source_port"]}" ➔ {desc ["container"].name}."{desc ["target_port"]}" {format_message (desc ["message"])}'
-
-####
-
+  scoped in = indent {
+    scoped nm = dict-lookup (desc, container).name {
+      scoped prt = dict-lookup (desc, source_port) {
+	scoped tprt = dict-lookup (desc, target_port) {
+	   scoped m = format_message (dict-lookup (desc, target_message)) {
+	     return formatstring ("\n«»⇶ «».'«»' ➔ «».'«»' «»", in, nm, prt, nm, tprt, m)
+	   }
+	 }
+      }
+    }
+  }
 }
 defn make_InOut_Descriptor (container=ϕ, component=ϕ, in_message=ϕ, out_port=ϕ, out_message=ϕ) {
-
-    return {
-        "action": drInOut,
-        "container": container,
-        "component": component,
-        "in_message": in_message,
-        "out_message": out_message,
-        "fmt" : fmt_inout
-        }
-
-
+    return fresh-dict (
+        key (action) : symbol (inout),
+        key (container) : container,
+        key (component) : component,
+        key (in_message) : in_message,
+        key (out_message) : out_message,
+        key (fmt) : &fmt_inout
+        )
 }
 defn log_inout (container=ϕ, component=ϕ, in_message=ϕ) {
-
-    if component.outq.empty ():
+    if component.outq.empty () {
         log_inout_no_output (container=container, component=component, in_message=in_message)
-    else:
+    } else {
         log_inout_recursively (container=container, component=component, in_message=in_message, out_messages=list (component.outq.queue))
-
-
+    }
 }
-defn log_inout_no_output (container=ϕ, component=ϕ, in_message=ϕ) {
-
-    rdesc = make_InOut_Descriptor (container=container, component=component, in_message=in_message)
-    append_routing_descriptor (container, rdesc)
-
-
+defn log_inout_no_output (^container=ϕ, component=ϕ, in_message=ϕ) {
+    scoped rdesc = make_InOut_Descriptor (container=container, component=component, in_message=in_message) {
+      append_routing_descriptor (^container, rdesc)
+    }
 }
-defn log_inout_single (container=ϕ, component=ϕ, in_message=ϕ, out_message=ϕ) {
-
-    rdesc = make_InOut_Descriptor (container=container, component=component, in_message=in_message, out_message=out_message)
-    append_routing_descriptor (container, rdesc)
-
-
+defn log_inout_single (^container=ϕ, component=ϕ, in_message=ϕ, out_message=ϕ) {
+    scoped rdesc = make_InOut_Descriptor (container=container, component=component, in_message=in_message, out_message=out_message) {
+      append_routing_descriptor (^container, rdesc)
+    }
 }
-defn log_inout_recursively (container=ϕ, component=ϕ, in_message=ϕ, out_messages=[]) {
-
-    if [] == out_messages:
+defn log_inout_recursively (container=ϕ, component=ϕ, in_message=ϕ, out_messages=queueconstantempty ()) {
+    if queueisempty (out_messages) {
         pass
-    else:
-        m = out_messages [0]
-        rest = out_messages [1:]
+    } else {
+        m = queue_first (out_messages)
+        rest = queue_rest (out_messages)
         log_inout_single (container=container, component=component, in_message=in_message, out_message=m)
         log_inout_recursively (container=container, component=component, in_message=in_message, out_messages=rest)
-
-
+    }
 }
 defn fmt_inout (desc, indent) {
-
-    outm = desc ["out_message"]
-    if ϕ == outm:
-        return f'\n{indent}  ⊥'
-    else:
-        return f'\n{indent}  ∴ {desc ["component"].name} {format_message (outm)}'
-
-
+    scoped outm = dict-lookup (desc, out_message)
+    if ϕ == outm {
+        return formatstring ("\n«»  ⊥", indent)
+    } else {
+      scoped nm = dict-lookup (desc, component).name {
+        scoped m = format_message (outm) {
+          return formatstring ("\n«»  ∴«» «»", nm, m)
+        }
+      }
+    }
 }
 defn log_tick (container=ϕ, component=ϕ, in_message=ϕ) {
-
     pass
-
-        
-####
-
 }
 defn routing_trace_all (container) {
-
-    indent = ""
-    lis = list (container.routings.queue)
-    return recursive_routing_trace (container, lis, indent)
-
-
+    scoped indent = stringconst ("") {
+      scoped lis = list (container.routings.queue) {
+        return recursive_routing_trace (container, lis, indent)
+      }
+    }
 }
 defn recursive_routing_trace (container, lis, indent) {
-
-    if [] == lis:
-        return ''
-    else:
-        desc = first (lis)
-        formatted = desc ["fmt"] (desc, indent)
-        return formatted + recursive_routing_trace (container, rest (lis), indent + '  ')
-
-####
-
+    if listisempty (lis) {
+        return stringconst ("")
+    } else {
+        scoped desc = listfirst (lis) {
+          scoped formatted = (dict-lookup (desc, fmt)) (desc, indent) {
+            return stringconcat (formatted, recursive_routing_trace (container, stringrest (lis), stringappend (indent, stringconst (" "))))
+          }
+        }
+    }
 }
-defn first (arr) {
- # called "car" in Lisp
-    return (arr [0])
 
-
-}
-defn rest (arr) {
- # called "cdr" in Lisp
-    return (arr [1:])
-
-
-
+xxx
 enumDown = 0
 enumAcross = 1
 enumUp = 2
@@ -662,7 +584,7 @@ enumThrough = 3
 }
 defn container_instantiator (reg, owner, container_name, desc) {
 
-    global enumDown, enumUp, enumAcross, enumThrough
+    useglobal enumDown, enumUp, enumAcross, enumThrough
     container = make_container (container_name, owner)
     children = []
     children_by_id = {} # not strictly necessary, but, we can remove 1 runtime lookup by "compiling it out" here
