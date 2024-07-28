@@ -1,6 +1,9 @@
-defn gensym (s) {
-    useglobal (counter)
-    name_with_id = f"{s}{subscripted_digit (counter)}"
-    counter += 1
-    return name_with_id
+defn subscripted_digit (n) {
+  useglobal (digits)
+  if (n >= 0 and n <= 29) {
+    return digits [n]
+  } else {
+    return f"₊{n}"
+  }
 }
+

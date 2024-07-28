@@ -31,7 +31,11 @@ rt {
      | Lval "=" Exp -- eq
 
     Exp
-      = AddExp
+      = BooleanExp
+
+    BooleanExp =
+      | BooleanExp boolOp AddExp -- boolop
+      | AddExp
 
     AddExp
       = AddExp "+" MulExp  -- plus
@@ -61,6 +65,7 @@ rt {
       | phi -- phi
       | string -- string
       | ident FieldRef -- fieldref
+      | ident Subscript -- subscript
       | ident -- ident
       | number -- number
 
@@ -79,6 +84,8 @@ rt {
       | kw<"if">
       | kw<"elif">
       | kw<"else">
+      | kw<"and">
+      | kw<"or">
       
     ident  (an identifier)
       = ~keyword identHead identTail*
@@ -98,7 +105,11 @@ rt {
     Pair = string ":" Exp ","?
 
   FieldRef = "[" string "]"
+  Subscript = 
+    | "[" number "]"
+    | "[" ident "]"
 
+  boolOp = ("==" | "<=" | ">=" | ">" | "<" | kw<"and"> | kw<"or">) 
   phi = "ϕ"
   string =
     | "f" string -- fstring
