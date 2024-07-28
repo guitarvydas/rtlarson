@@ -670,7 +670,7 @@ defn container_instantiator (reg, owner, container_name, desc) {
         children.append (child_instance)
         children_by_id [child_desc ["id"]] = child_instance }
     container.children = children
-    self = container
+    me = container
     
     connectors = []
     for proto_conn in desc ["connections"] {
@@ -680,7 +680,7 @@ defn container_instantiator (reg, owner, container_name, desc) {
         if proto_conn ['dir'] == enumDown {
             # JSON: {'dir': 0, 'source': {'name': '', 'id': 0}, 'source_port': '', 'target': {'name': 'Echo', 'id': 12}, 'target_port': ''},
             connector.direction = "down"
-            connector.sender = Sender (self.name, self, proto_conn ['source_port'])
+            connector.sender = Sender (me.name, me, proto_conn ['source_port'])
             target_component = children_by_id [proto_conn ['target'] ['id']]
             if (target_component == ϕ) {
                 load_error (f"internal error: .Down connection target internal error {proto_conn['target']}")}
@@ -707,20 +707,20 @@ defn container_instantiator (reg, owner, container_name, desc) {
                 print (f"internal error: .Up connection source not ok {proto_conn ['source']}") }
             else {
                 connector.sender = Sender (source_component.name, source_component, proto_conn ['source_port'])
-                connector.receiver = Receiver (self.name, container.outq, proto_conn ['target_port'], self)
+                connector.receiver = Receiver (me.name, container.outq, proto_conn ['target_port'], me)
                 connectors.append (connector) }}
         elif proto_conn ['dir'] == enumThrough {
             connector.direction = "through"
-            connector.sender = Sender (self.name, self, proto_conn ['source_port'])
-            connector.receiver = Receiver (self.name, container.outq, proto_conn ['target_port'], self)
+            connector.sender = Sender (me.name, me, proto_conn ['source_port'])
+            connector.receiver = Receiver (me.name, container.outq, proto_conn ['target_port'], me)
             connectors.append (connector) }}
             
     container.connections = connectors
     return container
 
-# The default handler for container components.
 
 }
+# The default handler for container components.
 defn container_handler (container, message) {
 
     route (container=container, from_component=container, message=message) # references to 'self' are replaced by the container during instantiation

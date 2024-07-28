@@ -72,11 +72,11 @@ rt {
       | "⊥" -- false
       | kw<"range"> "(" Exp ")" -- range
       | string -- string
-      | PriExp Actuals -- call
       | Lval -- lval
       | number -- number
 
     Lval =
+      | PriExp Actuals -- call
       | ident FieldRef -- fieldref
       | ident Subscript -- subscript
       | ident -- ident
