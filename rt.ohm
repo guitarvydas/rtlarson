@@ -5,10 +5,9 @@ rt {
     | Defn -- defn
     | Defclass -- defclass
 
-   Defvar = kw<"defvar"> "=" Exp
+   Defvar = kw<"defvar"> Assignment
    Defn = kw<"defn"> ident Formals StatementBlock
    Defclass = kw<"defclass"> ident "{" Definit "}"
-   
 
    StatementBlock = "{" Statement+ "}"
 
@@ -63,7 +62,7 @@ rt {
       | ident -- ident
       | number -- number
 
-    Lval = ident FieldRef? "=" Exp
+    Lval = ident FieldRef?
 
     keyword =
       | kw<"fresh">
