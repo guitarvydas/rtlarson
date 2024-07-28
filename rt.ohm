@@ -6,25 +6,31 @@ rt {
     | Defclass -- defclass
 
    Defvar = kw<"defvar"> Assignment
-   Defn = kw<"defn"> ident Formals? StatementBlock
+   Defn = kw<"defn"> ident Formals StatementBlock
    Defclass = kw<"defclass"> ident "{" Definit "}"
 
    StatementBlock = "{" Statement+ "}"
 
-   Definit = kw<"definit"> "(" kw<"self"> ":" ident ")" "{" InitStatement+ "}"
+   Definit = kw<"definit"> "(" kw<"self"> ":" ident ("," ident)*")" "{" InitStatement+ "}"
    
    Statement =
-     | kw<"useglobal"> "(" ident ")" -- global
+     | kw<"global"> ident ("," ident)* -- globals
      | IfStatement -- if
-     | Assignment -- assignment
      | kw<"pass"> -- pass
      | kw<"return"> Exp -- return
+     | ForStatement -- for
+     | WhileStatement -- while
+     | Assignment -- assignment
+     | Lval  -- call
 
    InitStatement = kw<"self"> "." ident "=" Exp
 
    IfStatement = kw<"if"> Exp StatementBlock ElifStatement* ElseStatement?
    ElifStatement = kw<"elif"> Exp StatementBlock
    ElseStatement = kw<"else"> StatementBlock
+
+   ForStatement = kw<"for"> ident kw<"in"> Exp StatementBlock
+   WhileStatement = kw<"while"> Exp StatementBlock
 
    Assignment = 
      | Lval "+=" Exp -- pluseq
@@ -59,17 +65,22 @@ rt {
       | "{" (Pair ","?)+ "}" -- dict
       | "λ" Formals? ":" Exp -- lambda
       | kw<"fresh"> "(" ident ")" -- fresh
-      | PriExp Actuals -- call
       | "+" PriExp   -- pos
       | "-" PriExp   -- neg
       | phi -- phi
+      | "⊤" -- true
+      | "⊥" -- false
+      | kw<"range"> "(" Exp ")" -- range
       | string -- string
+      | PriExp Actuals -- call
+      | Lval -- lval
+      | number -- number
+
+    Lval =
       | ident FieldRef -- fieldref
       | ident Subscript -- subscript
       | ident -- ident
-      | number -- number
 
-    Lval = ident FieldRef?
 
     keyword =
       | kw<"fresh">
@@ -86,6 +97,9 @@ rt {
       | kw<"else">
       | kw<"and">
       | kw<"or">
+      | kw<"in">
+      | kw<"range">
+      | kw<"while">
       
     ident  (an identifier)
       = ~keyword identHead identTail*
@@ -93,10 +107,20 @@ rt {
     identHead = "_" | letter
     identTail = alnum | identHead
 
-    Formals = "(" ident ("," ident)* ")"
+    Formals =
+      | "(" ")" -- noformals
+      | "(" Formal ("," Formal)* ")" -- withformals
+
+    Formal = ident ("=" Exp)?
+    
     Actuals = 
       | "(" ")" -- noactuals
-      | "(" Exp ("," Exp)* ")" -- actuals
+      | "(" Actual ("," Actual)* ")" -- actuals
+
+   Actual =
+     | ParamName? Exp
+
+   ParamName = ident "="
 
     number  (a number)
       = digit* "." digit+  -- fract
@@ -109,9 +133,12 @@ rt {
     | "." ident Actuals FieldRef? -- method
     | "." ident FieldRef? -- attribute
     
-  Subscript = 
-    | "[" number "]"
-    | "[" ident "]"
+  Subscript =
+    | "[" ":" "]" -- slicewhole
+    | "[" "1" ":" "]" -- slicerest
+    | "[" number "]" -- num
+    | "[" ident "]" -- ident
+    | "[" Exp "]" -- exp
 
   boolOp = ("==" | "<=" | ">=" | ">" | "<" | kw<"and"> | kw<"or">) 
   phi = "ϕ"
@@ -125,5 +152,10 @@ rt {
   notsq = ~"'" any
 
    kw<s> = s ~identTail
+
+  comment = "#" notnl* nl
+  nl = "\n"
+  notnl = ~nl any
+  space += comment
 
 }

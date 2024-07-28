@@ -10,14 +10,14 @@ defvar digits = [
 ]
 
 defn gensym (s) {
-    useglobal (counter)
+    global counter
     name_with_id = f"{s}{subscripted_digit (counter)}"
     counter += 1
     return name_with_id
 }
 
 defn subscripted_digit (n) {
-  useglobal (digits)
+  global digits
   if (n >= 0 and n <= 29) {
     return digits [n]
   } else {
@@ -653,13 +653,11 @@ defn rest (arr) {
 
 
 
-enumDown = 0
-enumAcross = 1
-enumUp = 2
-enumThrough = 3
+defvar enumDown = 0
+defvar enumAcross = 1
+defvar enumUp = 2
+defvar enumThrough = 3
 
-
-}
 defn container_instantiator (reg, owner, container_name, desc) {
 
     global enumDown, enumUp, enumAcross, enumThrough
@@ -667,15 +665,15 @@ defn container_instantiator (reg, owner, container_name, desc) {
     children = []
     children_by_id = {} # not strictly necessary, but, we can remove 1 runtime lookup by "compiling it out" here
     # collect children
-    for child_desc in desc ["children"]:
+    for child_desc in desc ["children"] {
         child_instance = get_component_instance (reg, child_desc ["name"], container)
         children.append (child_instance)
-        children_by_id [child_desc ["id"]] = child_instance
+        children_by_id [child_desc ["id"]] = child_instance }
     container.children = children
     self = container
     
     connectors = []
-    for proto_conn in desc ["connections"]:
+    for proto_conn in desc ["connections"] {
         source_component = ϕ
         target_component = ϕ
         connector = Connector ()
@@ -715,7 +713,7 @@ defn container_instantiator (reg, owner, container_name, desc) {
             connector.direction = "through"
             connector.sender = Sender (self.name, self, proto_conn ['source_port'])
             connector.receiver = Receiver (self.name, container.outq, proto_conn ['target_port'], self)
-            connectors.append (connector) }
+            connectors.append (connector) }}
             
     container.connections = connectors
     return container
@@ -726,8 +724,8 @@ defn container_instantiator (reg, owner, container_name, desc) {
 defn container_handler (container, message) {
 
     route (container=container, from_component=container, message=message) # references to 'self' are replaced by the container during instantiation
-    while any_child_ready (container):
-        step_children (container, message)
+    while any_child_ready (container) {
+        step_children (container, message)}
 
 # Frees the given container and associated data.
 
@@ -857,7 +855,7 @@ defn fetch_saved_message_and_clear (eh) {
 defn step_children (container, causingMessage) {
       
     container.state = "idle"
-    for child in list (container.visit_ordering.queue):
+    for child in list (container.visit_ordering.queue) {
         # child == container represents self, skip it
         if (not (is_self (child, container))){
             if (not (child.inq.empty ())){
@@ -886,7 +884,7 @@ defn step_children (container, causingMessage) {
             while (not (child.outq.empty ())) {
                 msg = child.outq.get ()
                 route(container, child, msg)
-                destroy_message(msg)}}
+                destroy_message(msg)}}}
 
 
 }
