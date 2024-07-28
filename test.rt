@@ -1,3 +1,34 @@
+defn junk {
+  inst.semantics_filename = clone_string (msg.datum.srepr ())
+  }
+
+defvar counter = 0
+
+defvar digits = [
+    "₀", "₁", "₂", "₃", "₄", "₅",
+    "₆", "₇", "₈", "₉",
+    "₁₀", "₁₁", "₁₂", "₁₃", "₁₄",
+    "₁₅", "₁₆", "₁₇", "₁₈", "₁₉",
+    "₂₀", "₂₁", "₂₂", "₂₃", "₂₄",
+    "₂₅", "₂₆", "₂₇", "₂₈", "₂₉"
+]
+
+defn gensym (s) {
+    useglobal (counter)
+    name_with_id = f"{s}{subscripted_digit (counter)}"
+    counter += 1
+    return name_with_id
+}
+
+defn subscripted_digit (n) {
+  useglobal (digits)
+  if (n >= 0 and n <= 29) {
+    return digits [n]
+  } else {
+    return f"₊{n}"
+  }
+}
+
 defclass Datum {
   definit (self:Datum) {
       self.data = ϕ
@@ -7,4 +38,17 @@ defclass Datum {
       self.kind = ϕ
       self.raw = ϕ
   }
+}
+
+defn new_datum_string (s) {
+    d = fresh (Datum)
+    d.data = s
+    d.clone = λ: clone_datum_string (d)
+    d.reclaim = λ: reclaim_datum_string (d)    
+    d.srepr = λ: srepr_datum_string (d)
+    d.raw = λ: raw_datum_string (d)    
+    d.kind = λ: "string"
+    return d
+
+
 }

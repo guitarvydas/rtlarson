@@ -104,7 +104,11 @@ rt {
 
     Pair = string ":" Exp ","?
 
-  FieldRef = "[" string "]"
+  FieldRef = 
+    | "[" string "]" FieldRef? -- field
+    | "." ident Actuals FieldRef? -- method
+    | "." ident FieldRef? -- attribute
+    
   Subscript = 
     | "[" number "]"
     | "[" ident "]"
