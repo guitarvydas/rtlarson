@@ -1,9 +1,10 @@
-defn subscripted_digit (n) {
-  useglobal (digits)
-  if (n >= 0 and n <= 29) {
-    return digits [n]
-  } else {
-    return f"₊{n}"
+defclass Datum {
+  definit (self:Datum) {
+      self.data = ϕ
+      self.clone = ϕ
+      self.reclaim = ϕ
+      self.srepr = ϕ
+      self.kind = ϕ
+      self.raw = ϕ
   }
 }
-
