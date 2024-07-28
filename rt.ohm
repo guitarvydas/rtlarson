@@ -6,7 +6,7 @@ rt {
     | Defclass -- defclass
 
    Defvar = kw<"defvar"> Assignment
-   Defn = kw<"defn"> ident Formals StatementBlock
+   Defn = kw<"defn"> ident Formals? StatementBlock
    Defclass = kw<"defclass"> ident "{" Definit "}"
 
    StatementBlock = "{" Statement+ "}"
@@ -26,7 +26,9 @@ rt {
    ElifStatement = kw<"elif"> Exp StatementBlock
    ElseStatement = kw<"else"> StatementBlock
 
-   Assignment = Lval "=" Exp
+   Assignment = 
+     | Lval "+=" Exp -- pluseq
+     | Lval "=" Exp -- eq
 
     Exp
       = AddExp
@@ -79,11 +81,12 @@ rt {
       | kw<"else">
       
     ident  (an identifier)
-      = ~keyword letter identTail*
+      = ~keyword identHead identTail*
 
-    identTail = alnum
+    identHead = "_" | letter
+    identTail = alnum | identHead
 
-    Formals = "(" ident ("," ident)* ")" ":"
+    Formals = "(" ident ("," ident)* ")"
     Actuals = 
       | "(" ")" -- noactuals
       | "(" Exp ("," Exp)* ")" -- actuals
@@ -98,6 +101,9 @@ rt {
 
   phi = "ϕ"
   string =
+    | "f" string -- fstring
+    | basicstring -- basic
+  basicstring =
     | "\"" notdq* "\"" -- dqstring
     | "'" notsq* "'" -- sqstring
   notdq = ~"\"" any
