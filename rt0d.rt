@@ -39,11 +39,11 @@ defclass Datum {
 defn new_datum_string (s) {
     d = fresh (Datum)
     d.data = s
-    d.clone = λ clone_datum_string (d)
-    d.reclaim = λ reclaim_datum_string (d)    
-    d.srepr = λ srepr_datum_string (d)
-    d.raw = λ raw_datum_string (d)    
-    d.kind = λ "string"
+    d.clone = λ: clone_datum_string (d)
+    d.reclaim = λ: reclaim_datum_string (d)    
+    d.srepr = λ: srepr_datum_string (d)
+    d.raw = λ: raw_datum_string (d)    
+    d.kind = λ: "string"
     return d
 
 
@@ -79,11 +79,11 @@ defn new_datum_bang () {
 
     p = Datum ()
     p.data = ⊤
-    p.clone = λ clone_datum_bang (p)
-    p.reclaim = λ reclaim_datum_bang (p)
-    p.srepr = λ srepr_datum_bang ()
-    p.raw = λ raw_datum_bang ()    
-    p.kind = λ "bang"
+    p.clone = λ: clone_datum_bang (p)
+    p.reclaim = λ: reclaim_datum_bang (p)
+    p.srepr = λ: srepr_datum_bang ()
+    p.raw = λ: raw_datum_bang ()    
+    p.kind = λ: "bang"
     return p
 
 
@@ -118,10 +118,10 @@ defn raw_datum_bang () {
 defn new_datum_tick () {
       
     p = new_datum_bang ()
-    p.kind = λ "tick"
-    p.clone = λ new_datum_tick ()
-    p.srepr = λ srepr_datum_tick ()
-    p.raw = λ raw_datum_tick ()
+    p.kind = λ: "tick"
+    p.clone = λ: new_datum_tick ()
+    p.srepr = λ: srepr_datum_tick ()
+    p.raw = λ: raw_datum_tick ()
     return p
 
 
@@ -146,10 +146,10 @@ defn new_datum_bytes (b) {
     p = Datum ()
     p.data = b[:]
     p.clone = clone_datum_bytes
-    p.reclaim = λ reclaim_datum_bytes (p)
-    p.srepr = λ srepr_datum_bytes (b)
-    p.raw = λ raw_datum_bytes (b)
-    p.kind = λ "bytes"
+    p.reclaim = λ: reclaim_datum_bytes (p)
+    p.srepr = λ: srepr_datum_bytes (b)
+    p.raw = λ: raw_datum_bytes (b)
+    p.kind = λ: "bytes"
     return p
 
 
@@ -197,11 +197,11 @@ defn new_datum_int (i) {
       
     p = Datum ()
     p.data = i
-    p.clone = λ clone_int (i)
-    p.reclaim = λ reclaim_int (i)
-    p.srepr = λ srepr_datum_int (i)
-    p.raw = λ raw_datum_int (i)
-    p.kind = λ "int"
+    p.clone = λ: clone_int (i)
+    p.reclaim = λ: reclaim_int (i)
+    p.srepr = λ: srepr_datum_int (i)
+    p.raw = λ: raw_datum_int (i)
+    p.kind = λ: "int"
     return p
 
 
