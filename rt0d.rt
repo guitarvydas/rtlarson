@@ -641,17 +641,6 @@ defn recursive_routing_trace (container, lis, indent) {
 ####
 
 }
-defn first (arr) {
- # called "car" in Lisp
-    return (arr [0])
-
-
-}
-defn rest (arr) {
- # called "cdr" in Lisp
-    return (arr [1:])
-
-
 
 defvar enumDown = 0
 defvar enumAcross = 1
@@ -934,7 +923,7 @@ defn dump_possible_connections (container) {
       
     print (f"*** possible connections for {container.name}:")
     for connector in container.connections {
-        print (f"{connector.direction} {connector.sender.name}."{connector.sender.port}" _> {connector.receiver.name}."{connector.receiver.port}"") }
+        print (f"{connector.direction} {connector.sender.name}.{connector.sender.port} -> {connector.receiver.name}.{connector.receiver.port}") }
 
 
 }
@@ -1011,10 +1000,11 @@ defclass Template {
 }
 defn read_and_convert_json_file (filename) {
     try {
-        with open(filename, 'r') as file {
+        fil = open(filename, 'r')
             json_data = file.read()
             routings = json.loads(json_data)
-            return routings }}
+	    close (fil)
+            return routings }
     except FileNotFoundError {
         print (f"File not found: {filename}")
         return ϕ}
@@ -1277,10 +1267,10 @@ defn print_specific_output (eh, port="", stderr=⊥) {
     datum = fetch_first_output (eh, port)
     if datum != ϕ{
         if stderr{              # I don't remember why I found it useful to print to stderr during bootstrapping, so I've left it in...
-            f = sys.stderr}
+            outf = sys.stderr}
         else{
-            f = sys.stdout}
-        print (datum.srepr (), file=f)}
+            outf = sys.stdout}
+        print (datum.srepr (), file=outf)}
 }
 
 defn put_output (eh, msg) {
@@ -1297,8 +1287,8 @@ import re
 import subprocess
 import shlex
 
-root_project = ""
-root_0D = ""
+defvar root_project = ""
+defvar root_0D = ""
 
 defn set_environment (rproject, r0D) {
     global root_project

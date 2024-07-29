@@ -4,22 +4,25 @@ rt {
     | Defvar -- defvar
     | Defn -- defn
     | Defclass -- defclass
+    | Import -- import
 
    Defvar = kw<"defvar"> Assignment
    Defn = kw<"defn"> ident Formals StatementBlock
    Defclass = kw<"defclass"> ident "{" Definit "}"
+   Import = kw<"import"> ident
 
    StatementBlock = "{" Statement+ "}"
 
-   Definit = kw<"definit"> "(" kw<"self"> ":" ident ("," ident)*")" "{" InitStatement+ "}"
+   Definit = kw<"definit"> "(" kw<"self"> ":" ident ("," Formal)*")" "{" InitStatement+ "}"
    
    Statement =
      | kw<"global"> ident ("," ident)* -- globals
      | IfStatement -- if
      | kw<"pass"> -- pass
-     | kw<"return"> Exp -- return
+     | kw<"return"> ReturnExp -- return
      | ForStatement -- for
      | WhileStatement -- while
+     | TryStatement -- try
      | Assignment -- assignment
      | Lval  -- call
 
@@ -32,15 +35,30 @@ rt {
    ForStatement = kw<"for"> ident kw<"in"> Exp StatementBlock
    WhileStatement = kw<"while"> Exp StatementBlock
 
+   TryStatement = kw<"try"> StatementBlock ExceptBlock+
+   ExceptBlock =
+     | kw<"except"> Exp kw<"as"> ident StatementBlock -- as
+     | kw<"except"> ident StatementBlock -- basic
+   
    Assignment = 
      | Lval "+=" Exp -- pluseq
-     | Lval "=" Exp -- eq
+     | "[" Lval ("," Lval)+ "]" "=" Exp -- multiple
+     | Lval "=" Exp -- single
+
+
+    ReturnExp =
+      | "[" Exp ("," Exp)+ "]" -- multiple
+      | Exp -- single
 
     Exp
       = BooleanExp
 
     BooleanExp =
-      | BooleanExp boolOp AddExp -- boolop
+      | BooleanExp boolOp BooleanNot -- boolop
+      | BooleanNot -- basic
+
+    BooleanNot =
+      | kw<"not"> BooleanExp -- not
       | AddExp
 
     AddExp
@@ -72,14 +90,11 @@ rt {
       | "⊥" -- false
       | kw<"range"> "(" Exp ")" -- range
       | string -- string
-      | Lval -- lval
       | number -- number
-
-    Lval =
-      | PriExp Actuals -- call
-      | ident FieldRef -- fieldref
-      | ident Subscript -- subscript
+      | ident PrimaryTail -- identwithtail
       | ident -- ident
+
+    Lval = Exp PrimaryTail?
 
 
     keyword =
@@ -98,8 +113,15 @@ rt {
       | kw<"and">
       | kw<"or">
       | kw<"in">
+      | kw<"not">
       | kw<"range">
       | kw<"while">
+      | kw<"f\"">
+      | kw<"f'">
+      | kw<"import">
+      | kw<"try">
+      | kw<"except">
+      | kw<"as">
       
     ident  (an identifier)
       = ~keyword identHead identTail*
@@ -128,24 +150,30 @@ rt {
 
     Pair = string ":" Exp ","?
 
-  FieldRef = 
-    | "[" string "]" FieldRef? -- field
-    | "." ident Actuals FieldRef? -- method
-    | "." ident FieldRef? -- attribute
-    
-  Subscript =
+  PrimaryTail =
+    | MethodCall PrimaryTail? -- methodcall
+    | OffsetRef PrimaryTail? -- offsetref
+    | FieldLookup PrimaryTail? -- lookup
+    | Slice PrimaryTail? -- slice
+
+  MethodCall = Actuals
+  
+  OffsetRef =
+    | "." ident -- dot
+
+  FieldLookup =
+    | "[" "0" "]" -- slicefirst
+    | "[" Exp "]" -- lookup
+
+  Slice =
     | "[" ":" "]" -- slicewhole
     | "[" "1" ":" "]" -- slicerest
-    | "[" number "]" -- num
-    | "[" ident "]" -- ident
-    | "[" Exp "]" -- exp
 
-  boolOp = ("==" | "<=" | ">=" | ">" | "<" | kw<"and"> | kw<"or">) 
+  boolOp = ("==" | "!=" | "<=" | ">=" | ">" | "<" | kw<"and"> | kw<"or"> | kw<"in">) 
   phi = "ϕ"
   string =
-    | "f" string -- fstring
-    | basicstring -- basic
-  basicstring =
+    | "f\"" notdq* "\"" -- fdqstring
+    | "f'" notsq* "'" -- fsqstring
     | "\"" notdq* "\"" -- dqstring
     | "'" notsq* "'" -- sqstring
   notdq = ~"\"" any
