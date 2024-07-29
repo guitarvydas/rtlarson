@@ -168,6 +168,7 @@ rt {
   Slice =
     | "[" ":" "]" -- slicewhole
     | "[" "1" ":" "]" -- slicerest
+    | "[" digit+ ":" "]" -- nthslice
 
   boolOp = ("==" | "!=" | "<=" | ">=" | ">" | "<" | kw<"and"> | kw<"or"> | kw<"in">) 
   phi = "ϕ"
