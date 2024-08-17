@@ -22,4 +22,4 @@ rtpy0d.py : ../rt/rtpy0d.py
 
 # to install required libs, do this once
 install-js-requires:
-	npm install ohm-js yargs prompt-sync
+	npm install ohm-js yargs prompt-
