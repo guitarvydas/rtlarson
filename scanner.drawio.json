@@ -19,7 +19,7 @@
                     "name": "",
                     "id": 0
                 },
-                "source_port": "start",
+                "source_port": "",
                 "target": {
                     "name": "Larson",
                     "id": 7
