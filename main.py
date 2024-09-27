@@ -20,11 +20,11 @@ def start_function (root_project, root_0D, arg, main_container):
 
 ## Leaf components for this project...
 def components_to_include_in_project (root_project, root_0D, reg):
-    zd.register_component (reg, zd.Template (name = "Delay", instantiator = delay))
-    zd.register_component (reg, zd.Template (name = "Count", instantiator = count))
-    zd.register_component (reg, zd.Template (name = "Reverser", instantiator = reverser))
-    zd.register_component (reg, zd.Template (name = "Decode", instantiator = decode))
-    zd.register_component (reg, zd.Template (name = "👀", instantiator = monitor))
+    zd.register_component (reg, zd.Template ("Delay", None, delay))
+    zd.register_component (reg, zd.Template ("Count", None, count))
+    zd.register_component (reg, zd.Template ("Reverser", None, reverser))
+    zd.register_component (reg, zd.Template ("Decode", None, decode))
+    zd.register_component (reg, zd.Template ("👀", None, monitor))
 
 
 
