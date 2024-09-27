@@ -8,6 +8,8 @@ scanner: scanner.drawio py0d.py
 	${D2J} scanner.drawio
 	python3 main.py . 0D/python "" main scanner.drawio.json
 
+py0d.py: ../rt/rtpy0d.py
+	cp ../rt/rtpy0d.py ./py0d.py
 
 ## house-keeping
 
