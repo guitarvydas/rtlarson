@@ -14,5 +14,5 @@ def handler (eh, msg):
     elif msg.port == "rev":
         direction = direction * -1
 def instantiator (reg, owner, name, template_data):
-    name_with_id = zd.gensym ("Count")
+    name_with_id = zd.gensymbol ("Count")
     return zd.make_leaf (name_with_id, owner, None, handler)

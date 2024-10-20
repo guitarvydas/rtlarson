@@ -13,6 +13,6 @@ def handler (eh, msg):
     zd.send_bang (eh, "done", msg)
 
 def instantiator (reg, owner, name, template_data):
-    name_with_id = zd.gensym ("Decode")
+    name_with_id = zd.gensymbol ("Decode")
     return zd.make_leaf (name_with_id, owner, None, handler)
 

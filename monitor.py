@@ -5,7 +5,7 @@ def install (reg):
     zd.register_component (reg, zd.Template ("@", None, instantiator))
 
 def instantiator (reg, owner, name, template_data):      
-    name_with_id = zd.gensym ("@")
+    name_with_id = zd.gensymbol ("@")
     return zd.make_leaf (name=name_with_id, owner=owner, instance_data=None, handler=handler)
 
 def handler (eh, msg):

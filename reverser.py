@@ -21,6 +21,6 @@ def handler (eh, msg):
         else:
             pass
 def instantiator (reg, owner, name, template_data):
-    name_with_id = zd.gensym ("Reverser")
+    name_with_id = zd.gensymbol ("Reverser")
     return zd.make_leaf (name_with_id, owner, None, handler)
 

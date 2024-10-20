@@ -11,7 +11,7 @@ class Delay_Info:
         self.saved_message = saved_message
 
 def instantiator (reg, owner, name, template_data):
-    name_with_id = zd.gensym ("delay")
+    name_with_id = zd.gensymbol ("delay")
     info = Delay_Info ()
     return zd.make_leaf (name_with_id, owner, info, handler)
 
