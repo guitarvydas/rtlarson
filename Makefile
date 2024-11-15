@@ -2,22 +2,8 @@
 
 D2J=./das2json/mac/das2json
 
-all: scanner
+all: scanner.drawio.json
 
-scanner: scanner.drawio py0d.py
+scanner.drawio.json: ../scanner.drawio
 	${D2J} scanner.drawio
-	python3 main.py . 0D/python "" main scanner.drawio.json
-
-py0d.py: ../rt/generated.py
-	cp ../rt/generated.py ./py0d.py
-
-## house-keeping
-
-clean:
-	rm -rf *.json
-	rm -rf *~
-	rm -rf __pycache__
-
-install-js-requires:
-	npm install yargs prompt-sync
 
