@@ -2,17 +2,15 @@
 
 all: scanner
 
-scanner: scanner.drawio.json py0d.py
-	python3 main.py . ../0D/python "" main scanner.drawio.json
+scanner: scanner.drawio.json generated.py
+	python3 main.py . - "" main scanner.drawio.json
 
-py0d.py: ../../rt/generated.py
-	cp ../../rt/generated.py ./py0d.py
+generated.py: ../../rt/generated.py
+	cp ../../rt/generated.py ./generated.py
 
-scanner.drawio.json: ../scanner.drawio.json
+scanner.drawio.json: ../scanner.drawio ../scanner.drawio.json
+	(cd ..; make)
 	cp ../scanner.drawio.json .
-
-../scanner.drawio.json:
-	(cd .. ; make)
 
 ## house-keeping
 
@@ -21,6 +19,6 @@ clean:
 	rm -rf *~
 	rm -rf __pycache__
 
-install-js-requires:
-	npm install yargs prompt-sync
-
+# python3 -m venv ./rt
+# source rt/bin/activate
+# pip3 install websockets

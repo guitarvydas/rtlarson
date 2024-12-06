@@ -1,12 +1,11 @@
-import py0d as zd
+import generated
 
-[palette, env] = zd.initialize ()
+[palette, env] = generated.initialize ()
 
-import delay, count, reverser, decode, monitor
-delay.install (palette)
-count.install (palette)
-reverser.install (palette)
-decode.install (palette)
-monitor.install (palette)
+generated.delay_install (palette)
+generated.count_install (palette)
+generated.reverser_install (palette)
+generated.decode_install (palette)
+generated.monitor_install (palette)
 
-zd.start (palette, env)
+generated.start (palette, env)
